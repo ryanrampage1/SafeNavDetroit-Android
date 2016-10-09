@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.safenavdetroit.safenavdetroit.R;
+
 /**
  * Created by ryancasler on 10/8/16
  * SafeNavDetroit
@@ -23,7 +25,7 @@ public class LoadingActivity extends BaseActivity {
     }
 
     @Override int getLayoutRes() {
-        return 0;
+        return R.layout.activity_loading;
     }
 
     @Override protected void onCreate(Bundle savedInstanceState) {

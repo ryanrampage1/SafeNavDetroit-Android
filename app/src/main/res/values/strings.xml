@@ -11,5 +11,5 @@
     <string name="address_search">Searching for Address</string>
     <string name="addressSearchFailed">Address search failed</string>
     <string name="noResultsFound">No results found</string>
-    <string name="loading_the_safest_route">Loading the safest route...</string>
+    <string name="loading_the_safest_route">Loading the safest route…</string>
 </resources>

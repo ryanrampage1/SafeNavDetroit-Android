@@ -2,7 +2,6 @@ package com.safenavdetroit.safenavdetroit.Network;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.safenavdetroit.safenavdetroit.BuildConfig;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -39,7 +38,6 @@ public class SafeNavDetroitAPI {
             // Customize the request
             Request request = original.newBuilder()
                     .header("Content-Type", "application/json")
-//                    .header("Authorization", "")
                     .method(original.method(), original.body())
                     .build();
 
@@ -58,7 +56,7 @@ public class SafeNavDetroitAPI {
 
         // create Retrofit rest adapter
         Retrofit restAdapter = new Retrofit.Builder()
-                .baseUrl(BuildConfig.HOST)
+                .baseUrl("http://69.164.221.203:5000/")
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))

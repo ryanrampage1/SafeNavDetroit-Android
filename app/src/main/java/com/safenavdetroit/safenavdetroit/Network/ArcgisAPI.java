@@ -56,7 +56,6 @@ public class ArcgisAPI {
 
         // create Retrofit rest adapter
         Retrofit restAdapter = new Retrofit.Builder()
-//                .baseUrl("https://www.arcgis.com/")
                 .baseUrl("http://geocode.arcgis.com/")
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
