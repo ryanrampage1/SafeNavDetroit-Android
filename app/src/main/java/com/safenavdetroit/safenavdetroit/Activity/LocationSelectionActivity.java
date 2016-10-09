@@ -1,12 +1,11 @@
 package com.safenavdetroit.safenavdetroit.Activity;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.esri.core.tasks.geocode.Locator;
 import com.esri.core.tasks.geocode.LocatorFindParameters;
@@ -17,12 +16,11 @@ import com.safenavdetroit.safenavdetroit.OnLocationSelected;
 import com.safenavdetroit.safenavdetroit.R;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
-import rx.Observable;
 import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by ryancasler on 10/8/16
@@ -35,6 +33,7 @@ public class LocationSelectionActivity extends BaseActivity implements OnLocatio
 
     private Subscription sourceSubscription;
     private LocationAdapter adapter;
+    Locator locator;
 
     @Override int getLayoutRes() {
         return R.layout.activity_location_selection;
@@ -48,6 +47,8 @@ public class LocationSelectionActivity extends BaseActivity implements OnLocatio
 
         adapter = new LocationAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
+
+        locator = Locator.createOnlineLocator();
     }
 
     @Override protected void onResume() {
@@ -56,52 +57,29 @@ public class LocationSelectionActivity extends BaseActivity implements OnLocatio
     }
 
     private void setUpFields() {
-        Observable<CharSequence> source = RxTextView.textChanges(locationEditText).skip(1);
-        sourceSubscription = source
+        sourceSubscription = RxTextView.
+                textChanges(locationEditText)
+                .skip(1)
                 .debounce(333, TimeUnit.MILLISECONDS)
-                .subscribe(text -> {
-                    String s = text.toString();
-                    Log.d("d", s);
-                    executeLocatorTask(s);
-                });
-    }
+                .map(charSequence -> {
 
-    private void executeLocatorTask(String address) {
-        // Create Locator parameters from single line address string
-        LocatorFindParameters findParams = new LocatorFindParameters(address);
-        new LocatorAsyncTask().execute(findParams);
-    }
-
-    private class LocatorAsyncTask extends AsyncTask<LocatorFindParameters, Void, List<LocatorGeocodeResult>> {
-        private Exception mException;
-
-        @Override protected List<LocatorGeocodeResult> doInBackground(LocatorFindParameters... params) {
-            mException = null;
-            List<LocatorGeocodeResult> results = null;
-            Locator locator = Locator.createOnlineLocator();
-            try {
-                results = locator.find(params[0]);
-            } catch (Exception e) {
-                mException = e;
-            }
-            return results;
-        }
-
-        @Override protected void onPostExecute(List<LocatorGeocodeResult> result) {
-            if (mException != null) {
-                Log.w("PlaceSearch", "LocatorSyncTask failed with:");
-                mException.printStackTrace();
-                Toast.makeText(LocationSelectionActivity.this, getString(R.string.addressSearchFailed), Toast.LENGTH_LONG).show();
-                return;
-            }
-
-            if (result.size() == 0) {
-                Toast.makeText(LocationSelectionActivity.this, getString(R.string.noResultsFound), Toast.LENGTH_LONG).show();
-            } else {
-                Log.d("List", result.toString());
-                adapter.updateList(result);
-            }
-        }
+                    //locator.find() throws exception so we have to catch it
+                    try {
+                        return locator.find(new LocatorFindParameters(charSequence.toString()));
+                    } catch (Exception e) {
+                        Log.e("Get locations", e.toString());
+                        return null;
+                    }
+                })
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(locatorGeocodeResults -> {
+                            Log.d("List", locatorGeocodeResults.toString());
+                            adapter.updateList(locatorGeocodeResults);
+                        },
+                        throwable -> {
+                            Log.e("Get locations", throwable.toString());
+                            Snackbar.make(recyclerView, getString(R.string.addressSearchFailed), Snackbar.LENGTH_SHORT).show();
+                        });
     }
 
     @Override protected void onDestroy() {
