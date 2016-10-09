@@ -8,8 +8,6 @@ import android.widget.TextView;
 
 import com.esri.core.tasks.geocode.LocatorGeocodeResult;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.List;
 
 /**
@@ -20,17 +18,19 @@ import java.util.List;
 public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHolder> {
 
     private List<LocatorGeocodeResult> data;
+    private OnLocationSelected listener;
 
-    public LocationAdapter(List<LocatorGeocodeResult> data) {
+    public LocationAdapter(List<LocatorGeocodeResult> data, OnLocationSelected listener) {
         this.data = data;
+        this.listener = listener;
     }
 
     public void updateList(List<LocatorGeocodeResult> results){
         data = results;
         notifyDataSetChanged();
     }
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+
+    @Override public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.card_location, parent, false);
 
         ViewHolder vh = new ViewHolder(v);
@@ -40,22 +40,20 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         return vh;
     }
 
-    @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    @Override public void onBindViewHolder(final ViewHolder holder, int position) {
         LocatorGeocodeResult result = data.get(position);
         holder.address.setText(result.getAddress());
 
         holder.data = data;
     }
 
-    @Override
-    public int getItemCount() {
+    @Override public int getItemCount() {
         if (data!=null)
             return data.size();
         return 0;
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView address;
         List<LocatorGeocodeResult> data;
 
@@ -65,7 +63,8 @@ public class LocationAdapter extends RecyclerView.Adapter<LocationAdapter.ViewHo
         }
 
         @Override public void onClick(View view) {
-            EventBus.getDefault().post(data.get(getLayoutPosition()));
+            if (listener != null)
+                listener.onLocationSelected(data.get(getLayoutPosition()));
         }
     }
 }

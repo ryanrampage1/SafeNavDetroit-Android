@@ -13,11 +13,10 @@ import com.esri.core.tasks.geocode.LocatorFindParameters;
 import com.esri.core.tasks.geocode.LocatorGeocodeResult;
 import com.jakewharton.rxbinding.widget.RxTextView;
 import com.safenavdetroit.safenavdetroit.LocationAdapter;
+import com.safenavdetroit.safenavdetroit.OnLocationSelected;
 import com.safenavdetroit.safenavdetroit.R;
 
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -29,7 +28,7 @@ import rx.Subscription;
  * Created by ryancasler on 10/8/16
  * SafeNavDetroit
  */
-public class LocationSelectionActivity extends BaseActivity {
+public class LocationSelectionActivity extends BaseActivity implements OnLocationSelected {
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.edit_text_location) EditText locationEditText;
@@ -47,10 +46,8 @@ public class LocationSelectionActivity extends BaseActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(mLayoutManager);
 
-        adapter = new LocationAdapter(null);
+        adapter = new LocationAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
-
-        EventBus.getDefault().register(this);
     }
 
     @Override protected void onResume() {
@@ -113,14 +110,11 @@ public class LocationSelectionActivity extends BaseActivity {
             sourceSubscription.unsubscribe();
     }
 
-    @Override public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
+    @Override public void onLocationSelected(LocatorGeocodeResult location) {
+        Log.d("Location Selected", location.toString());
 
-    @Subscribe public void onLocationSelected(LocatorGeocodeResult event) {
-        float lon = (float) event.getLocation().getX();
-        float lat = (float) event.getLocation().getY();
+        float lon = (float) location.getLocation().getX();
+        float lat = (float) location.getLocation().getY();
 
         startActivity(LoadingActivity.getIntent(lat,lon,this));
     }

@@ -39,4 +39,13 @@ public class GsonClasses {
         public float x;
         public float y;
     }
+
+    public static class CoordinateResponse {
+        public ArrayList<Coordinate> coordinates;
+    }
+
+    public static class Coordinate {
+        public float latitude;
+        public float longitude;
+    }
 }

@@ -56,7 +56,8 @@ public class SafeNavDetroitAPI {
 
         // create Retrofit rest adapter
         Retrofit restAdapter = new Retrofit.Builder()
-                .baseUrl("http://69.164.221.203:5000/")
+//                .baseUrl("http://69.164.221.203:5000/")
+                .baseUrl("http://10.0.2.2/")
                 .client(client)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create(gson))
