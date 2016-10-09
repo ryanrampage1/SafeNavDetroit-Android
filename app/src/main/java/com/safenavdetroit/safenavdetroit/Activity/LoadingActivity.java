@@ -13,6 +13,7 @@ import android.util.Log;
 import com.safenavdetroit.safenavdetroit.Network.SafeNavDetroitAPI;
 import com.safenavdetroit.safenavdetroit.R;
 
+import butterknife.OnClick;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -34,33 +35,26 @@ public class LoadingActivity extends BaseActivity {
         return intent;
     }
 
-    @Override
-    int getLayoutRes() {
+    @Override int getLayoutRes() {
         return R.layout.activity_loading;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    @OnClick(R.id.button_debug_continue) public void goToMap() {
+        startActivity(MapActivity.getIntent(getLat(), getLon(), this));
+    }
 
-        float lat = getIntent().getFloatExtra(I_LAT, 0);
-        float lon = getIntent().getFloatExtra(I_LON, 0);
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         Location current = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         String query = String.valueOf(current.getLatitude()) + "," + String.valueOf(current.getLongitude()) +
-                ";" + String.valueOf(lat) + "," + String.valueOf(lon);
+                ";" + String.valueOf(getLat()) + "," + String.valueOf(getLon());
 
         SafeNavDetroitAPI.INSTANCE.getRestAdapter().getCrimes(query)
                 .subscribeOn(Schedulers.io())
@@ -69,4 +63,7 @@ public class LoadingActivity extends BaseActivity {
                         throwable -> Log.e("E", throwable.toString()));
 
     }
+
+    private float getLat()  { return getIntent().getFloatExtra(I_LAT, 0); }
+    private float getLon()  { return getIntent().getFloatExtra(I_LON, 0); }
 }

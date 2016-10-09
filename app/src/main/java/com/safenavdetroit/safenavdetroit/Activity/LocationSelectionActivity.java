@@ -96,7 +96,6 @@ public class LocationSelectionActivity extends BaseActivity implements OnLocatio
 
         startActivity(LoadingActivity.getIntent(lat,lon,this));
     }
-
 }
 
 

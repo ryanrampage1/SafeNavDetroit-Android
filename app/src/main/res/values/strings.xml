@@ -12,4 +12,5 @@
     <string name="addressSearchFailed">Address search failed</string>
     <string name="noResultsFound">No results found</string>
     <string name="loading_the_safest_route">Loading the safest route…</string>
+    <string name="continue_to_map">Debug continue to map</string>
 </resources>
