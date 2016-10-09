@@ -7,7 +7,6 @@ import android.os.Bundle;
 import com.esri.android.map.GraphicsLayer;
 import com.esri.android.map.MapView;
 import com.esri.android.map.event.OnStatusChangedListener;
-import com.esri.core.map.Graphic;
 import com.safenavdetroit.safenavdetroit.R;
 
 import butterknife.BindView;
@@ -50,7 +49,6 @@ public class MapActivity extends BaseActivity {
         });
 
         mMapView.centerAt(getLat(), getLon(), false);
-        mLocationLayer.addGraphic(new Graphic())
     }
 
     private float getLat()  { return getIntent().getFloatExtra(I_LAT, 0); }
